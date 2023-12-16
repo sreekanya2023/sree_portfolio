@@ -1,0 +1,20 @@
+---
+title: "Welcome To My Blog"
+author: "Sreekanya Peddireddi"
+date: "2023-01-01"
+categories: [news]
+---
+
+<<<<<<< HEAD
+Success is a journey which begins with simple steps, with that this is the first post in my blog. We are going to explore my set of skills as demonmstrated in different areas in consideartions to my understaning in R proghramming language. Welcome!
+
+![](sk.jpg)
+
+Am a well vast experienced and well trained fellow, the subsequent post are about my portfolio, feel free to dive in.
+=======
+This is the first post in my blog. Welcome!
+
+![](sk.jpg)
+
+In this section blog we will review a few of my projects done on different environments and career period.
+>>>>>>> c32f1ce5885422cbe2b0d61378a0b0ba0c796fba

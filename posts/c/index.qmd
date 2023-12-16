@@ -1,0 +1,66 @@
+---
+title: "Iris exploratory data analysis"
+author: "Sreekanya Peddireddi"
+date: "2023-12-06"
+categories: [news, code, analysis,plotly,plot]
+image: "b.jpg"
+---
+
+The script employs exploratory data analysis to visualize features of the Iris dataset, subsequently implementing a decision tree model for species classification, evaluating its accuracy on a test set, and presenting a confusion matrix, offering insights into both data exploration and machine learning application on the Iris dataset.
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+
+# Load your IRSI data (replace "your_dataset.csv" with your actual dataset file)
+IRSI_data <- read.csv("D:/QUARTO/SK/Quarto data science portfolio/Iris.csv")
+
+# Display the first few rows of the dataset
+head(IRSI_data)
+
+# Check the structure of the dataset
+str(IRSI_data)
+
+# Summary statistics for numerical variables
+summary(IRSI_data)
+
+# Check for missing values
+sapply(IRSI_data, function(x) sum(is.na(x)))
+
+# Frequency table for the Species variable
+table(IRSI_data$Species)
+
+# Print column names
+colnames(IRSI_data)
+
+# Correlation matrix
+cor(IRSI_data[, 1:4])
+
+# Load the corrplot library
+library(corrplot)
+
+# Extract the correlation matrix
+cor_matrix <- cor(IRSI_data[, 2:5])  # Assuming IRSI_data is your data frame
+
+# Create a correlation plot
+corrplot(cor_matrix, method = "circle", tl.col = "black", addrect = 2)
+
+# Boxplot by Species
+par(mfrow = c(1, 4))
+for (i in 1:4) {
+  boxplot(IRSI_data[, i] ~ IRSI_data$Species, main = colnames(IRSI_data)[i], col = c("skyblue", "lightgreen", "lightcoral"))
+}
+
+# Histogram for SepalLengthCm
+hist(IRSI_data$SepalLengthCm, col = "skyblue", main = "Sepal Length Distribution")
+# Density plot for PetalWidthCm
+ggplot(IRSI_data, aes(x = PetalWidthCm, fill = Species)) +
+  geom_density(alpha = 0.7) +
+  ggtitle("Petal Width Density by Species")
+# Violin plot for PetalLengthCm
+ggplot(IRSI_data, aes(x = Species, y = PetalLengthCm, fill = Species)) +
+  geom_violin() +
+  ggtitle("Petal Length Distribution by Species")
+
+```

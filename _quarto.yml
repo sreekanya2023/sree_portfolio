@@ -1,0 +1,37 @@
+project:
+  type: website
+
+website:
+  title: "Sreekanya Peddireddi"
+  favicon: "images/sk.jpg"
+  page-footer:
+    center: |
+      [Contact Sreekanya Peddireddi](mailto:sree.kanyareddy8301@gmail.com)
+    left: |
+      Made with [Sreekanya Peddireddi](https://quarto.org/)
+    right: |
+      [Github Code Repo](https://github.com/sreekanya2023/sree_portfolio.git)
+    background: "#00ffff"
+    
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: projects.qmd
+        text: Blog post
+      - href: resume.qmd
+        text: Resume
+        
+    right:
+      - icon: github
+        href: https://github.com/sreekanya2023
+      - icon: twitter
+        href: https://twitter.com
+format:
+  html:
+    theme:
+      light: darkly
+      dark: [vapor]
+    highlight-style: github
+editor: visual
+

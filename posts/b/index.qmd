@@ -1,0 +1,82 @@
+---
+title: "Data conversion and sorting"
+author: "Sreekanya Peddireddi"
+date: "2023-12-06"
+categories: [news, code, analysis,plotly,plot]
+image: "b.jpg"
+---
+
+```{r}
+# Install and load necessary packages
+library(tm)
+library(SnowballC)
+
+# Create a sample dataframe with medical content
+medical_data <- data.frame(
+  PatientID = c(1, 2, 3),
+  Text = c(
+    "The patient presented with symptoms of persistent cough and shortness of breath. Chest X-ray revealed bilateral infiltrates.",
+    "After conducting a thorough examination, the physician diagnosed the patient with hypertension and prescribed antihypertensive medication.",
+    "The laboratory results indicated elevated levels of cholesterol and triglycerides. Dietary recommendations were provided to manage the lipid profile."
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Create a Corpus (text document) from the Text column
+corpus <- Corpus(VectorSource(medical_data$Text))
+
+# Perform text preprocessing (removing punctuation, converting to lowercase, stemming)
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removeWords, stopwords("en"))
+corpus <- tm_map(corpus, stemDocument)
+
+# Create a Document-Term Matrix (DTM)
+dtm <- DocumentTermMatrix(corpus)
+
+# Convert DTM to a data frame
+dtm_df <- as.data.frame(as.matrix(dtm))
+dtm_df$PatientID <- medical_data$PatientID
+
+# Display the resulting data frame
+print(dtm_df)
+
+```
+
+```{r}
+library(tidyverse)
+
+# EDA on the Document-Term Matrix (dtm_df)
+# Summary statistics
+summary(dtm_df)
+
+# Check the structure of the data
+str(dtm_df)
+
+# Check for missing values
+sum(is.na(dtm_df))
+
+# Check variable names
+colnames(dtm_df)
+
+# Display the first few rows of the data
+head(dtm_df)
+
+# Visualize the distribution of PatientID
+ggplot(dtm_df, aes(x = PatientID)) +
+  geom_bar(fill = "blue", alpha = 0.7) +
+  labs(title = "Distribution of PatientID")
+
+# Visualize the most common terms
+term_freq <- colSums(dtm_df[, -ncol(dtm_df)])
+term_freq_df <- data.frame(Term = names(term_freq), Frequency = term_freq)
+term_freq_df <- term_freq_df[order(-term_freq_df$Frequency), ]
+
+# Plot the top N terms
+top_n_terms <- 10
+ggplot(head(term_freq_df, top_n_terms), aes(x = reorder(Term, Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "green", alpha = 0.7) +
+  labs(title = paste("Top", top_n_terms, "Terms"), x = "Term", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```

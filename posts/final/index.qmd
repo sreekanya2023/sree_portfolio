@@ -1,0 +1,150 @@
+---
+title: "Comprehensive demonstartion of R prgramming language through a randomly generated dataset."
+author: "Sreekanya Peddireddi"
+date: "2023-12-13"
+categories: [news, code, analysis,plotly,plot]
+image: "image.jpg"
+---
+
+## INTRODUCTION
+
+We are going to explore R programming language as skill attained over time as i have learnt and understood it. In this project an going to generate a random data set of 100 multiple and different labeling and in turn conduct a simple data arrangement sorting cleaning EDA (exploratory data analysis) and a linear regression model with proper visualization and accuracy measures telemeters.
+
+# RANDOM DATASET
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+
+set.seed(123)
+
+num_samples <- 100
+
+data <- tibble(
+  ID = 1:num_samples,
+  Age = sample(18:60, num_samples, replace = TRUE),
+  Gender = sample(c("Male", "Female"), num_samples, replace = TRUE),
+  Income = rnorm(num_samples, mean = 50000, sd = 15000),
+  Education_Level = sample(c("High School", "Bachelor's", "Master's", "PhD"), num_samples, replace = TRUE),
+  Region = sample(c("North", "South", "East", "West"), num_samples, replace = TRUE),
+  Product_A = rpois(num_samples, lambda = 10),
+  Product_B = rpois(num_samples, lambda = 15)
+)
+
+# Displaying the dataset using kableExtra
+data %>%
+  head() %>%
+  kable() %>%
+  kable_styling()
+
+
+```
+
+## DATA EXPLORATION
+Due to the size we will just conduct a few exploratory analysis without going into detail but we will demonstrate the relationship between the product bought and the type of people whom bought it and their education level. 
+```{r}
+library(dplyr)
+library(tidyr)
+
+# Summary statistics by Education Level for Product A and Product B
+summary_stats <- data %>%
+  group_by(Education_Level) %>%
+  summarise(
+    Mean_Product_A = mean(Product_A),
+    Mean_Product_B = mean(Product_B),
+    Median_Product_A = median(Product_A),
+    Median_Product_B = median(Product_B),
+    Total_Product_A = sum(Product_A),
+    Total_Product_B = sum(Product_B)
+  )
+
+print(summary_stats)
+
+```
+
+```{r}
+library(ggplot2)
+
+# Visualizing Product A and Product B purchases by Education Level
+purchase_plot <- data %>%
+  gather(Product, Purchases, Product_A, Product_B) %>%
+  ggplot(aes(x = Education_Level, y = Purchases, fill = Product)) +
+  geom_boxplot() +
+  labs(
+    title = "Product A and Product B Purchases by Education Level",
+    x = "Education Level",
+    y = "Number of Purchases"
+  ) +
+  scale_fill_manual(values = c("Product_A" = "blue", "Product_B" = "green")) +
+  theme_minimal()
+
+print(purchase_plot)
+```
+
+## LOGISTICS LINEAR REGRESSION MODEL
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+library(caret)
+
+set.seed(123)
+
+# Assuming 'Income' is the target variable, creating predictors (X) and target variable (y)
+X <- data %>% select(-ID, -Income)
+y <- data$Income
+
+# Splitting the data into training and testing sets (80% training, 20% testing)
+train_index <- createDataPartition(y, p = 0.8, list = FALSE)
+train_data <- data[train_index, ]
+test_data <- data[-train_index, ]
+
+```
+```{r}
+# Load the necessary library
+library(lmtest)
+
+# Fit a linear regression model
+lm_model <- lm(Income ~ ., data = train_data)
+
+# Summary of the model
+summary(lm_model)
+```
+```{r}
+# Making predictions on the test set
+predictions <- predict(lm_model, newdata = test_data)
+
+# Calculate model performance metrics (e.g., RMSE, R-squared)
+rmse <- sqrt(mean((test_data$Income - predictions)^2))
+rsquared <- summary(lm_model)$r.squared
+
+cat("Root Mean Squared Error (RMSE):", rmse, "\n")
+cat("R-squared:", rsquared, "\n")
+```
+```{r}
+# Plotting actual vs predicted values
+library(ggplot2)
+
+# Creating a data frame with actual and predicted values
+results <- data.frame(Actual = test_data$Income, Predicted = predictions)
+
+# Scatterplot
+ggplot(results, aes(x = Actual, y = Predicted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  labs(title = "Actual vs Predicted Income", x = "Actual Income", y = "Predicted Income")
+# Diagnostic plots for linear regression
+plot(lm_model)
+```
+
+
+## RESULTS AND DISCUSSIONS
+The regression analysis aimed to examine the factors influencing the dependent variable, presumably a monetary measure. The model included various independent variables such as ID, Age, Gender, Education Level, Region, and Product type. The coefficients of the model indicate the estimated impact of each variable on the outcome.
+The results indicate that most coefficients lack statistical significance in predicting the dependent variable, as evident from their high p-values. Notably, Gender (specifically being Male) exhibited a statistically significant positive relationship with the outcome, suggesting that males tend to have a higher value in the dependent variable compared to females. However, caution is advised in interpreting this result due to the limited significance of other variables in the model.
+Moreover, variables such as Education Level, Region, and Product type did not show substantial influence on the dependent variable, as their coefficients were not statistically significant. The overall model fit is weak, with an adjusted R-squared of 0.005288, indicating that the independent variables collectively explain only a small proportion of the variability in the dependent variable.
+
+## CONCLUSION
+In conclusion, based on this analysis, the model does not adequately explain the variations in the dependent variable using the selected independent variables. Further investigation or refinement of the model by considering additional relevant factors or improving the dataset might be necessary to achieve a more accurate understanding of the factors affecting the outcome variable.
+
